@@ -7,7 +7,10 @@ import (
 
 func main() {
 	client := dairugger.NewClient()
-	targets, _ := client.GetTargets()
 
+	targets, _ := client.GetTargets()
 	fmt.Println(targets)
+
+	registers, _ := client.GetX64Registers()
+	fmt.Println(registers)
 }
