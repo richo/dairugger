@@ -32,6 +32,8 @@ func NewClient() Client {
 }
 
 func (c *Client) Get() {
+	// Our broken dialer just throws the hostname on the ground, but we'll call
+	// it voltron for prettiness reasons
 	resp, _ := c.client.Get("http://voltron/api/request")
 	fmt.Println(resp)
 }
