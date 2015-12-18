@@ -1,16 +1,22 @@
 package dairugger
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
-
 	"net"
 	"net/http"
-
 	"os/user"
 )
 
 type Client struct {
 	client http.Client
+}
+
+type VoltronResponse struct {
+	Type   string          `json: "type"`
+	Status string          `json: "status"`
+	Data   json.RawMessage `json: "data"`
 }
 
 func NewClient() Client {
@@ -31,9 +37,27 @@ func NewClient() Client {
 	}
 }
 
-func (c *Client) Get() {
+func (c *Client) Get(route string) (*VoltronResponse, error) {
 	// Our broken dialer just throws the hostname on the ground, but we'll call
 	// it voltron for prettiness reasons
-	resp, _ := c.client.Get("http://voltron/api/request")
-	fmt.Println(resp)
+	path := fmt.Sprintf("http://voltron/api/%s", route)
+	resp, err := c.client.Get(path)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	decoder := json.NewDecoder(resp.Body)
+
+	var data VoltronResponse
+	err = decoder.Decode(&data)
+	if err != nil {
+		return nil, err
+	}
+
+	if data.Status != "success" {
+		return nil, errors.New("Api request failed")
+	}
+
+	return &data, nil
 }

@@ -1,10 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"github.com/richo/dairugger"
 )
 
 func main() {
 	client := dairugger.NewClient()
-	client.Get()
+	targets, _ := client.GetTargets()
+
+	fmt.Println(targets)
 }
